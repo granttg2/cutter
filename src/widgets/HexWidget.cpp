@@ -121,6 +121,10 @@ HexWidget::HexWidget(QWidget *parent) :
     addAction(actionSelectRange);
     connect(&rangeDialog, &QDialog::accepted, this, &HexWidget::onRangeDialogAccepted);
 
+    actionHighlight = new QAction(tr("Highlight"), this);
+    connect(actionHighlight, &QAction::triggered, this, &HexWidget::highlight);
+    addAction(actionHighlight);
+
     actionsWriteString.reserve(5);
     QAction* actionWriteString = new QAction(tr("Write string"), this);
     connect(actionWriteString, &QAction::triggered, this, &HexWidget::w_writeString);
@@ -689,6 +693,11 @@ void HexWidget::onRangeDialogAccepted()
         return;
     }
     selectRange(rangeDialog.getStartAddress(), rangeDialog.getEndAddress());
+}
+
+void HexWidget::highlight()
+{
+    return;
 }
 
 void HexWidget::w_writeString()

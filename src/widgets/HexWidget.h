@@ -311,7 +311,8 @@ private slots:
     void copy();
     void copyAddress();
     void onRangeDialogAccepted();
-
+    void highlight();
+    
     // Write command slots
     void w_writeString();
     void w_increaseDecrease();
@@ -518,6 +519,7 @@ private:
     QAction *actionCopy;
     QAction *actionCopyAddress;
     QAction *actionSelectRange;
+    QAction *actionHighlight;
     QList<QAction *> actionsWriteString;
     QList<QAction *> actionsWriteOther;
 
