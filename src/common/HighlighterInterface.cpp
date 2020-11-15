@@ -5,29 +5,29 @@
 
 HighlighterInterface::~HighlighterInterface()
 {
-    
+
 }
 
 
-HighlightRange* HighlighterInterface::getHighlightRangeByAddress(RVA address)
+HighlightRange *HighlighterInterface::getHighlightRangeByAddress(RVA address)
 {
-    for(HighlightRange range:highlights){
-        if(range.startAddress <= address && range.endAddress >= address){
+    for (HighlightRange range : highlights) {
+        if (range.startAddress <= address && range.endAddress >= address) {
             return &highlights[range.index];
         }
     }
     return nullptr;
 }
 
-HighlightRange* HighlighterInterface::getHighlightRangeByIndex(int index)
+HighlightRange *HighlighterInterface::getHighlightRangeByIndex(int index)
 {
     return &highlights[index];
 }
 
 int HighlighterInterface::getHighlightRangeIndex(RVA address)
 {
-       for(HighlightRange range:highlights){
-        if(range.startAddress <= address && range.endAddress >= address){
+    for (HighlightRange range : highlights) {
+        if (range.startAddress <= address && range.endAddress >= address) {
             return range.index;
         }
     }
@@ -37,22 +37,23 @@ int HighlighterInterface::getHighlightRangeIndex(RVA address)
 QList<HighlightRange> HighlighterInterface::getHighlightRanges(RVA startAddress, RVA endAddress)
 {
     QList<HighlightRange> returnRange;
-    for(HighlightRange range:HighlighterInterface::highlights)
-    {
-        if(range.startAddress >= startAddress && range.endAddress <= endAddress){
+    for (HighlightRange range : HighlighterInterface::highlights) {
+        if (range.startAddress >= startAddress && range.endAddress <= endAddress) {
             returnRange.append(range);
-        }else if(range.startAddress <= startAddress && range.endAddress <= endAddress){
-            range.startAddress = startAddress; //Need to ensure this does not change the highlightrange, I don't think it does but I need to make sure.
+        } else if (range.startAddress <= startAddress && range.endAddress <= endAddress) {
+            range.startAddress =
+                startAddress; 
             returnRange.append(range);
-        }else if(range.startAddress >= startAddress && range.endAddress >= endAddress){
-            range.endAddress = endAddress;//Same here ^^^.
+        } else if (range.startAddress >= startAddress && range.endAddress >= endAddress) {
+            range.endAddress = endAddress;
             returnRange.append(range);
         }
     }
     return returnRange;
 }
 
-void HighlighterInterface::addHighlight(RVA startAddress, RVA endAddress, QColor color, char* toolTip=nullptr)
+void HighlighterInterface::addHighlight(RVA startAddress, RVA endAddress, QColor color,
+                                        char *toolTip = nullptr)
 {
     HighlightRange range;
     range.startAddress = startAddress;
@@ -79,9 +80,9 @@ void HighlighterInterface::addHighlight(RVA startAddress, RVA endAddress, QColor
 
 void HighlighterInterface::removeHighlight(int index)
 {
-     highlights.removeAt(index);
-     updateIndicies();
-     emit highlightsChanged();
+    highlights.removeAt(index);
+    updateIndicies();
+    emit highlightsChanged();
 }
 
 void HighlighterInterface::setHighlightStartAddress(int index, RVA startAddress)
@@ -102,7 +103,7 @@ void HighlighterInterface::setHighlightColor(int index, QColor color)
     emit highlightsChanged();
 }
 
-void HighlighterInterface::setHighlightToolTip(int index, char* toolTip)
+void HighlighterInterface::setHighlightToolTip(int index, char *toolTip)
 {
     highlights[index].toolTip = toolTip;
     emit highlightsChanged();
@@ -111,7 +112,7 @@ void HighlighterInterface::setHighlightToolTip(int index, char* toolTip)
 void HighlighterInterface::updateIndicies()
 {
     HighlightRange temp;
-    for(int i = 0; i < highlights.size(); i++){
+    for (int i = 0; i < highlights.size(); i++) {
         HighlightRange temp = highlights.at(i);
         temp.index = i;
         highlights.replace(i, temp);

@@ -11,8 +11,7 @@
 #include <QMenu>
 #include <memory>
 
-struct BasicCursor
-{
+struct BasicCursor {
     uint64_t address;
     bool pastEnd;
     BasicCursor(uint64_t pos) : address(pos), pastEnd(false) {}
@@ -53,8 +52,7 @@ struct BasicCursor
     }
 };
 
-struct HexCursor
-{
+struct HexCursor {
     HexCursor() { isVisible = false; onAsciiArea = false; }
 
     bool isVisible;
@@ -102,8 +100,10 @@ public:
 
     void fetch(uint64_t, int) override { }
 
-    bool copy(void *out, uint64_t addr, size_t len) override {
-        if (addr < static_cast<uint64_t>(m_buffer.size()) && (static_cast<uint64_t>(m_buffer.size()) - addr) < len) {
+    bool copy(void *out, uint64_t addr, size_t len) override
+    {
+        if (addr < static_cast<uint64_t>(m_buffer.size())
+                && (static_cast<uint64_t>(m_buffer.size()) - addr) < len) {
             memcpy(out, m_buffer.constData() + addr, len);
             return true;
         }
@@ -146,9 +146,11 @@ public:
         }
     }
 
-    bool copy(void *out, uint64_t addr, size_t len) override {
+    bool copy(void *out, uint64_t addr, size_t len) override
+    {
         if (addr < m_firstBlockAddr || addr > m_lastValidAddr ||
-                (m_lastValidAddr - addr + 1) < len /* do not merge with last check to handle overflows */ || m_blocks.isEmpty()) {
+                (m_lastValidAddr - addr + 1) < len /* do not merge with last check to handle overflows */
+                || m_blocks.isEmpty()) {
             return false;
         }
 
@@ -160,7 +162,8 @@ public:
             memcpy(out, m_blocks.at(blockId).constData() + blockOffset, len);
         } else {
             memcpy(out, m_blocks.at(blockId).constData() + blockOffset, first_part);
-            memcpy(static_cast<char*>(out) + first_part, m_blocks.at(blockId + 1).constData(), len - first_part);
+            memcpy(static_cast<char *>(out) + first_part, m_blocks.at(blockId + 1).constData(),
+                   len - first_part);
         }
         return true;
     }
@@ -250,10 +253,10 @@ private:
 class HexHighlighter: public HighlighterInterface
 {
     Q_OBJECT
-    public slots:
-    void onRangeClicked(HighlightRange &range, QMouseEvent *event) override{(void)range; (void)event;}
+public slots:
+    void onRangeClicked(HighlightRange &range, QMouseEvent *event) override {(void)range; (void)event;}
 
-    void onRangeContextMenu(HighlightRange &range, QContextMenuEvent *event) override{(void)range; (void)event;}
+    void onRangeContextMenu(HighlightRange &range, QContextMenuEvent *event) override {(void)range; (void)event;}
 };
 
 
@@ -325,7 +328,7 @@ private slots:
     void highlight();
     void removeHighlight();
 
-    
+
     // Write command slots
     void w_writeString();
     void w_increaseDecrease();
@@ -524,8 +527,8 @@ private:
 
     const QString hexPrefix = QStringLiteral("0x");
 
-    QMenu* rowSizeMenu;
-    QAction* actionRowSizePowerOf2;
+    QMenu *rowSizeMenu;
+    QAction *actionRowSizePowerOf2;
     QList<QAction *> actionsItemSize;
     QList<QAction *> actionsItemFormat;
     QAction *actionItemBigEndian;
