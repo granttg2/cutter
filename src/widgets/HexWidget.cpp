@@ -24,6 +24,7 @@
 static constexpr uint64_t MAX_COPY_SIZE = 128 * 1024 * 1024;
 static constexpr int MAX_LINE_WIDTH_PRESET = 32;
 static constexpr int MAX_LINE_WIDTH_BYTES = 128 * 1024;
+static HexHighlighter hexHighlight;
 
 HexWidget::HexWidget(QWidget *parent) :
     QScrollArea(parent),
@@ -45,6 +46,7 @@ HexWidget::HexWidget(QWidget *parent) :
     setMouseTracking(true);
     setFocusPolicy(Qt::FocusPolicy::StrongFocus);
     connect(horizontalScrollBar(), &QScrollBar::valueChanged, this, [this]() { viewport()->update(); });
+    connect(&hexHighlight, &HexHighlighter::highlightsChanged, this, [=]() { refresh(); });
 
     connect(Config(), &Configuration::colorsUpdated, this, &HexWidget::updateColors);
     connect(Config(), &Configuration::fontsUpdated, this, [this]() { setMonospaceFont(
@@ -123,7 +125,10 @@ HexWidget::HexWidget(QWidget *parent) :
 
     actionHighlight = new QAction(tr("Highlight"), this);
     connect(actionHighlight, &QAction::triggered, this, &HexWidget::highlight);
-    addAction(actionHighlight);
+
+    actionRemoveHighlight = new QAction(tr("Remove Highlight"), this);
+    connect(actionRemoveHighlight, &QAction::triggered, this, &HexWidget::removeHighlight);
+    //connect(actionRemoveHighlight, SIGNAL(triggered), this, SLOT(onRangeContextMenu()));
 
     actionsWriteString.reserve(5);
     QAction* actionWriteString = new QAction(tr("Write string"), this);
@@ -433,6 +438,8 @@ void HexWidget::paintEvent(QPaintEvent *event)
     drawItemArea(painter);
     drawAsciiArea(painter);
 
+    drawHighlights(painter);
+
     if (!cursorEnabled)
         return;
 
@@ -633,6 +640,15 @@ void HexWidget::contextMenuEvent(QContextMenuEvent *event)
     menu->addAction(actionCopy);
     disableOutsideSelectionActions(mouseOutsideSelection);
     menu->addAction(actionCopyAddress);
+
+    if(selection.isEmpty() == false){
+        menu->addAction(actionHighlight);
+    }
+
+    if(hexHighlight.getHighlightRangeByAddress(getLocationAddress()) != nullptr){
+        menu->addAction(actionRemoveHighlight);
+    }
+
     menu->addActions(this->actions());
     menu->exec(mapToGlobal(pt));
     disableOutsideSelectionActions(false);
@@ -697,7 +713,45 @@ void HexWidget::onRangeDialogAccepted()
 
 void HexWidget::highlight()
 {
-    return;
+    RVA startAddress = getSelection().startAddress;
+    RVA endAddress = getSelection().endAddress;
+    hexHighlight.addHighlight(startAddress, endAddress, Qt::yellow);
+}
+
+void HexWidget::removeHighlight()
+{
+    int index = hexHighlight.getHighlightRangeIndex(getLocationAddress());
+    hexHighlight.removeHighlight(index);
+}
+
+void HexWidget::drawHighlights(QPainter &painter)
+{
+    QList<HighlightRange> currentRange = hexHighlight.getHighlightRanges(startAddress, lastVisibleAddr());
+    QVector<QRectF> vector;
+    QVector<QPolygonF> polygonItem;
+    QVector<QPolygonF> polygonAscii;
+    QColor color;
+    QBrush orig = painter.brush();
+    QBrush newBrush;
+    newBrush.setStyle(Qt::SolidPattern);
+
+
+    for(HighlightRange range : currentRange){
+        color = range.color;
+        color.setAlphaF(.5);
+        newBrush.setColor(color);
+        painter.setBrush(newBrush);
+        polygonItem = rangePolygons(range.startAddress, range.endAddress, false);
+        polygonAscii = rangePolygons(range.startAddress, range.endAddress, true);
+
+        for(QPolygonF q : polygonAscii){
+            painter.drawPolygon(q);
+        }
+        for(QPolygonF q : polygonItem){
+            painter.drawPolygon(q);
+        }
+    }
+    painter.setBrush(orig);
 }
 
 void HexWidget::w_writeString()

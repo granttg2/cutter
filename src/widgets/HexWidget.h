@@ -4,6 +4,7 @@
 #include "Cutter.h"
 #include "dialogs/HexdumpRangeDialog.h"
 #include "common/IOModesController.h"
+#include "common/HighlighterInterface.h"
 
 #include <QScrollArea>
 #include <QTimer>
@@ -246,6 +247,16 @@ private:
     bool m_empty;
 };
 
+class HexHighlighter: public HighlighterInterface
+{
+    Q_OBJECT
+    public slots:
+    void onRangeClicked(HighlightRange &range, QMouseEvent *event) override{(void)range; (void)event;}
+
+    void onRangeContextMenu(HighlightRange &range, QContextMenuEvent *event) override{(void)range; (void)event;}
+};
+
+
 class HexWidget : public QScrollArea
 {
     Q_OBJECT
@@ -312,6 +323,8 @@ private slots:
     void copyAddress();
     void onRangeDialogAccepted();
     void highlight();
+    void removeHighlight();
+
     
     // Write command slots
     void w_writeString();
@@ -332,6 +345,7 @@ private:
     void drawAddrArea(QPainter &painter);
     void drawItemArea(QPainter &painter);
     void drawAsciiArea(QPainter &painter);
+    void drawHighlights(QPainter &painter);
     void fillSelectionBackground(QPainter &painter, bool ascii = false);
     void updateMetrics();
     void updateAreasPosition();
@@ -520,6 +534,7 @@ private:
     QAction *actionCopyAddress;
     QAction *actionSelectRange;
     QAction *actionHighlight;
+    QAction *actionRemoveHighlight;
     QList<QAction *> actionsWriteString;
     QList<QAction *> actionsWriteOther;
 

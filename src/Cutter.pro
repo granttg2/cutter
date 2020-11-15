@@ -444,7 +444,8 @@ SOURCES += \
     widgets/CallGraph.cpp \
     widgets/AddressableDockWidget.cpp \
     dialogs/preferences/AnalOptionsWidget.cpp \
-    common/DecompilerHighlighter.cpp
+    common/DecompilerHighlighter.cpp \
+    common/HighlighterInterface.cpp
 
 GRAPHVIZ_SOURCES = \
     widgets/GraphvizLayout.cpp
@@ -604,7 +605,8 @@ HEADERS  += \
     widgets/CallGraph.h \
     widgets/AddressableDockWidget.h \
     dialogs/preferences/AnalOptionsWidget.h \
-    common/DecompilerHighlighter.h
+    common/DecompilerHighlighter.h \
+    common/HighlighterInterface.h
 
 GRAPHVIZ_HEADERS = widgets/GraphvizLayout.h
 
